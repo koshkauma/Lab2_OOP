@@ -202,16 +202,46 @@ namespace Lab2_OOP
 
         private void ProccessBuffer()
         {
+            Drawer.DrawFigure dp = chosenDrawer;
+            dp.figure = concreteFactory.Create(buffer);
+            if (dp.figure != null)
+            {
+                isSaved = false;
+                dp.Draw(Color_ColorPicker.SelectedColor.GetValueOrDefault(), SizeControl_IntegerUpDown.Value.GetValueOrDefault());
+                buffer.Clear();
+                if (!isMouseMove)
+                    counterOfFigures.Add(1);
+                else
+                {
+                    int prev = counterOfFigures.ElementAt(counterOfFigures.Count - 1);
+                    counterOfFigures[counterOfFigures.Count - 1] = prev + 1;
+                }
+            }
 
         }
 
         private void MainCanvas_Canvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            const
+                int X_FAULT = 115, Y_FAULT = 30;
+            Point tmp = e.GetPosition(sender as Control);
+            buffer.Add(new Point((tmp.X - X_FAULT), (tmp.Y - Y_FAULT)));
+            ProccessBuffer();
+            isLeftMouseButtonDown = true;
         }
 
         private void MainCanvas_Canvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            const
+                int X_FAULT = 115, Y_FAULT = 30;
+            if (isLeftMouseButtonDown)
+                if (chosenDrawer.GetType() == typeof(Drawer.DrawPoint))
+                {
+                    isMouseMove = true;
+                    Point tmp = e.GetPosition(sender as Control);
+                    buffer.Add(new Point((tmp.X - X_FAULT), (tmp.Y - Y_FAULT)));
+                    ProccessBuffer();
+                }
 
         }
     }
