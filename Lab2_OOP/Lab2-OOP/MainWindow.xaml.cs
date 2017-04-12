@@ -202,7 +202,7 @@ namespace Lab2_OOP
 
         private void ProccessBuffer()
         {
-            
+
         }
 
         private void MainCanvas_Canvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
