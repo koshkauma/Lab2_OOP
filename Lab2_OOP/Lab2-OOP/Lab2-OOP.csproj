@@ -89,6 +89,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Drawer\DrawEllipse.cs" />
+    <Compile Include="Drawer\DrawFigure.cs" />
+    <Compile Include="Drawer\DrawLine.cs" />
+    <Compile Include="Drawer\DrawPoint.cs" />
+    <Compile Include="Drawer\DrawRectangle.cs" />
+    <Compile Include="Drawer\DrawTriangle.cs" />
     <Compile Include="Figures\CustomCircle.cs" />
     <Compile Include="Figures\CustomEllipse.cs" />
     <Compile Include="Figures\CustomFigure.cs" />
@@ -145,6 +151,7 @@
     <Resource Include="Ресурсы\Triangle.jpg" />
     <Content Include="Xceed.Wpf.Toolkit.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
