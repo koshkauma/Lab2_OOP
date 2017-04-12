@@ -48,6 +48,8 @@ namespace Lab2_OOP.Figures
 
     public class RectangleFactory : FigureFactory
     {
+        protected CustomRectangle outdata { get; set; }
+
         public override CustomFigure Create(List<Point> buffer)
         {
             const
@@ -67,7 +69,8 @@ namespace Lab2_OOP.Figures
                     y_correction = 1;
                 Point A = new Point(buffer[0].X + x_correction * firstSide / 2, buffer[1].Y - y_correction * secondSide / 2);
 
-                return new CustomRectangle(A, firstSide, secondSide);
+                outdata = new CustomRectangle(A, firstSide, secondSide);
+                return outdata;
 
             }
             else
@@ -83,19 +86,8 @@ namespace Lab2_OOP.Figures
                 int ARGS_COUNT = 2;
             if (buffer.Count == ARGS_COUNT)
             {
-                double side = Helper.Pointlength(buffer[0], new Point(buffer[1].X, buffer[0].Y));
-                short x_correction = 1, y_correction = 1;
-                if (buffer[0].X > buffer[1].X)
-                    x_correction = -1;
-                else
-                    x_correction = 1;
-                if (buffer[0].Y > buffer[1].Y)
-                    y_correction = -1;
-                else
-                    y_correction = 1;
-                Point A = new Point(buffer[0].X + x_correction * side / 2, buffer[1].Y - y_correction * side / 2);
-
-                return new CustomSquare(A, side);
+                base.Create(buffer);
+                return new CustomSquare(outdata.A, outdata.firstSide);
 
             }
             else
@@ -118,16 +110,14 @@ namespace Lab2_OOP.Figures
         }
     }
 
-    public class CircleFactory : FigureFactory
+    public class CircleFactory : EllipseFactory
     {
         public override CustomFigure Create(List<Point> buffer)
         {
             const
                 int ARGS_COUNT = 2;
             if (buffer.Count == ARGS_COUNT)
-            {
                 return new CustomCircle(buffer[0], Helper.Pointlength(buffer[0], buffer[1]));
-            }
             else
                 return null;
         }
