@@ -46,33 +46,34 @@ namespace Lab2_OOP.Figures
         }
     }
 
+    
+
     public class RectangleFactory : FigureFactory
     {
-        protected CustomRectangle outdata { get; set; }
+        protected Point CheckRotation(List<Point> buffer)
+        {
+            double firstSide = Helper.Pointlength(buffer[0], new Point(buffer[1].X, buffer[0].Y));
+            double secondSide = Helper.Pointlength(buffer[0], new Point(buffer[0].X, buffer[1].Y));
+            short x_correction = 1, y_correction = 1;
+            if (buffer[0].X > buffer[1].X)
+                x_correction = -1;
+            else
+                x_correction = 1;
+            if (buffer[0].Y > buffer[1].Y)
+                y_correction = -1;
+            else
+                y_correction = 1;
+            return new Point(buffer[0].X + x_correction * firstSide / 2, buffer[1].Y - y_correction * secondSide / 2);
+
+        }
 
         public override CustomFigure Create(List<Point> buffer)
         {
             const
                 int ARGS_COUNT = 2;
             if (buffer.Count == ARGS_COUNT)
-            {
-                double firstSide = Helper.Pointlength(buffer[0], new Point(buffer[1].X, buffer[0].Y));
-                double secondSide = Helper.Pointlength(buffer[0], new Point(buffer[0].X, buffer[1].Y));
-                short x_correction = 1, y_correction = 1;
-                if (buffer[0].X > buffer[1].X)
-                    x_correction = -1;
-                else
-                    x_correction = 1;
-                if (buffer[0].Y > buffer[1].Y)
-                    y_correction = -1;
-                else
-                    y_correction = 1;
-                Point A = new Point(buffer[0].X + x_correction * firstSide / 2, buffer[1].Y - y_correction * secondSide / 2);
-
-                outdata = new CustomRectangle(A, firstSide, secondSide);
-                return outdata;
-
-            }
+                return new CustomRectangle(CheckRotation(buffer), Helper.Pointlength(buffer[0], new Point(buffer[1].X, buffer[0].Y)),
+                                                                  Helper.Pointlength(buffer[0], new Point(buffer[0].X, buffer[1].Y)));
             else
                 return null;
         }
@@ -85,11 +86,7 @@ namespace Lab2_OOP.Figures
             const
                 int ARGS_COUNT = 2;
             if (buffer.Count == ARGS_COUNT)
-            {
-                base.Create(buffer);
-                return new CustomSquare(outdata.A, outdata.firstSide);
-
-            }
+                return new CustomSquare(CheckRotation(buffer), Helper.Pointlength(buffer[0], new Point(buffer[1].X, buffer[0].Y)));
             else
                 return null;
         }
@@ -102,9 +99,7 @@ namespace Lab2_OOP.Figures
             const
                 int ARGS_COUNT = 3;
             if (buffer.Count == ARGS_COUNT)
-            {
                 return new CustomEllipse(buffer[0], Helper.Pointlength(buffer[0], buffer[1]), Helper.Pointlength(buffer[0], buffer[2]));
-            }
             else
                 return null;
         }
