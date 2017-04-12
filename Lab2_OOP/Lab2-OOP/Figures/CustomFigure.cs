@@ -8,7 +8,7 @@ namespace Lab2_OOP.Figures
 
         public CustomFigure(Point A)
         {
-            
+            this.A = A;
         }
     }
 }

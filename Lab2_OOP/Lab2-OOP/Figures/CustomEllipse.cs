@@ -9,7 +9,8 @@ namespace Lab2_OOP.Figures
 
         public CustomEllipse(Point center, double width, double height) : base(center)
         {
-            
+            this.width = width;
+            this.height = height;
 
         }
     }

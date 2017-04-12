@@ -12,7 +12,7 @@ namespace Lab2_OOP.Figures
 
         public CustomPoint(Point A): base (A)
         {
-            
+            this.A = A;
         }
     }
 }

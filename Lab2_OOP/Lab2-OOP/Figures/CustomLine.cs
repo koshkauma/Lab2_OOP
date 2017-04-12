@@ -8,7 +8,8 @@ namespace Lab2_OOP.Figures
 
         public CustomLine(Point A, Point B) : base(A)
         {
-            
+            this.A = A;
+            this.B = B;
         }
     }
 }
