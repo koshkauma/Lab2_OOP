@@ -19,6 +19,13 @@ namespace Lab2_OOP
 {
     public partial class MainWindow : Window
     {
+        protected Figures.FigureFactory concreteFactory { get; set; }
+        protected Drawer.DrawFigure chosenDrawer { get; set; }
+        protected List<Point> buffer { get; set; }
+        protected bool isSaved { get; set; }
+        protected bool isLeftMouseButtonDown { get; set; }
+        protected bool isMouseMove { get; set; }
+        protected List<int> counterOfFigures { get; set; }
 
         public MainWindow()
         {
@@ -27,47 +34,62 @@ namespace Lab2_OOP
 
         public void InitCanvas()
         {
-            
+            MainCanvas_Canvas.Children.Clear();
+            MainCanvas_Canvas.Background = Brushes.White;
         }
 
         private void MainWindow_Form_Initialized(object sender, EventArgs e)
         {
-            
+            concreteFactory = new Figures.PointFactory();
+            chosenDrawer = new Drawer.DrawPoint(MainCanvas_Canvas);
+            InitCanvas();
+            buffer = new List<Point>();
+            counterOfFigures = new List<int>();
+            isSaved = true;
+            isLeftMouseButtonDown = false;
+            isMouseMove = false;
         }
 
         private void Pencil_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.PointFactory();
+            chosenDrawer = new Drawer.DrawPoint(MainCanvas_Canvas);
         }
 
         private void Line_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.LineFactory();
+            chosenDrawer = new Drawer.DrawLine(MainCanvas_Canvas);
         }
 
         private void Triangle_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.TriangleFactory();
+            chosenDrawer = new Drawer.DrawTriangle(MainCanvas_Canvas);
         }
 
         private void Rectangle_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.RectangleFactory();
+            chosenDrawer = new Drawer.DrawRectangle(MainCanvas_Canvas);
         }
 
         private void Square_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.SquareFactory();
+            chosenDrawer = new Drawer.DrawRectangle(MainCanvas_Canvas);
         }
 
         private void Ellipse_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.EllipseFactory();
+            chosenDrawer = new Drawer.DrawEllipse(MainCanvas_Canvas);
         }
 
         private void Circle_IntstrumentGrid_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            concreteFactory = new Figures.CircleFactory();
+            chosenDrawer = new Drawer.DrawEllipse(MainCanvas_Canvas);
         }
 
 
@@ -94,33 +116,88 @@ namespace Lab2_OOP
 
         private void SaveInFile_FileMainMenu_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+            {
+                DefaultExt = ".png",
+                Filter = "Portable Network Graphics|*.png|Joint Photographic Experts Group|*.jpg|Bitmap Picture|*.bmp"
+            };
+            Thickness tmp = MainCanvas_Canvas.Margin;
+            MainCanvas_Canvas.Margin = new Thickness(0, 0, 0, 0);
+            dlg.ShowDialog();
+            if (dlg.FileName == "")
+                MessageBox.Show("Файл не выбран", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+            {
+                DrawingVisual drawingVisual = new DrawingVisual();
+                RenderTargetBitmap rtb = new RenderTargetBitmap((int)MainCanvas_Canvas.ActualWidth, (int)MainCanvas_Canvas.ActualHeight, 100, 100, PixelFormats.Pbgra32);
+                rtb.Render(MainCanvas_Canvas);
+                BitmapEncoder encoder = null;
+                if (dlg.FileName.Contains(".png"))
+                    encoder = new PngBitmapEncoder();
+                if (dlg.FileName.Contains(".jpg"))
+                    encoder = new JpegBitmapEncoder();
+                if (dlg.FileName.Contains(".bmp"))
+                    encoder = new BmpBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(rtb));
+                using (var fs = File.OpenWrite(dlg.FileName))
+                {
+                    encoder.Save(fs);
+                }
+                isSaved = true;
+            }
+            MainCanvas_Canvas.Margin = tmp;
         }
 
         private void MainWindow_Form_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            
+            if (!isSaved)
+            {
+                if (MessageBox.Show("Файл не сохранён. Вы уверены, что хотите завершить работу?", "Вы уверены?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    e.Cancel = false;
+                else
+                    e.Cancel = true;
+            }
+            else
+                e.Cancel = false;
         }
 
         private void MainWindow_Form_KeyDown(object sender, KeyEventArgs e)
         {
-            
+            if (e.Key == Key.F1)
+                Instruction_HelpMainMenu_MenuItem_Click(Instruction_HelpMainMenu_MenuItem, new RoutedEventArgs());
+            if (e.Key == Key.C & Keyboard.Modifiers == ModifierKeys.Control)
+                ClearCanvas_EditMainMenu_MenuItem_Click(ClearCanvas_EditMainMenu_MenuItem, new RoutedEventArgs());
+            if (e.Key == Key.F4 & Keyboard.Modifiers == ModifierKeys.Alt)
+                Application.Current.Shutdown();
+            if (e.Key == Key.S & Keyboard.Modifiers == ModifierKeys.Control)
+                SaveInFile_FileMainMenu_MenuItem_Click(SaveInFile_FileMainMenu_MenuItem, new RoutedEventArgs());
         }
 
 
         private void ClearCanvas_EditMainMenu_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            
+            MessageBoxResult result = MessageBox.Show("Это действие необратимо! Вы уверены, что хотите очистить полотно?", "Внимание", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.OK)
+            {
+                MainCanvas_Canvas.Background = Brushes.White;
+                InitCanvas();
+            }
         }
 
         private void DeleteLast_EditMainMenu_MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            
+            if (MainCanvas_Canvas.Children.Count != 0)
+            {
+                int amountOfElementsToDelete = counterOfFigures.ElementAt(counterOfFigures.Count - 1);
+                MainCanvas_Canvas.Children.RemoveRange(MainCanvas_Canvas.Children.Count - amountOfElementsToDelete, amountOfElementsToDelete + 1);
+                counterOfFigures.RemoveAt(counterOfFigures.Count - 1);
+            }
         }
 
         private void MainCanvas_Canvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            
+            isMouseMove = false;
+            isLeftMouseButtonDown = false;
         }
 
         private void ProccessBuffer()
@@ -130,16 +207,12 @@ namespace Lab2_OOP
 
         private void MainCanvas_Canvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+
         }
 
         private void MainCanvas_Canvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            
+
         }
-
-       
-
-        
     }
 }
